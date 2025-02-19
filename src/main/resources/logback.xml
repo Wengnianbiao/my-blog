@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="INFO" monitorInterval="30">
+    <Properties>
+        <!-- 应用名称 -->
+        <Property name="appName">interface</Property>
+        <!-- 日志保存路径前缀 -->
+        <Property name="fileNamePrefix">./logs/${appName}</Property>
+        <!-- 日志输出格式 -->
+        <Property name="patternLayout">%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %t - %l- :%m%n</Property>
+    </Properties>
+
+    <appenders>
+        <!--console:控制台输出配置-->
+        <console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${patternLayout}"/>
+        </console>
+
+        <!--RollingFileInfo:INFO级别滚动配置-->
+        <RollingFile name="RollingFileInfo" fileName="${fileNamePrefix}/${appName}_info.log"
+                     filePattern="${fileNamePrefix}/info/${appName}_info-%d{yyyy-MM-dd}-%i.log.gz">
+            <!--ThresholdFilter :日志输出过滤-->
+            <!--level="info":日志级别,onMatch="ACCEPT":级别在info之上则接受,onMismatch="DENY":级别在info之下则拒绝-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${patternLayout}"/>
+            <!-- Policies:日志滚动策略-->
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy:日志删除策略-->
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${fileNamePrefix}/info" maxDepth="1">
+                    <IfFileName glob="*info*"/>
+                    <IfLastModified age="15d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!--RollingFileError:ERROR级别滚动配置-->
+        <RollingFile name="RollingFileError" fileName="${fileNamePrefix}/${appName}_error.log"
+                     filePattern="${fileNamePrefix}/error/${appName}_error-%d{yyyy-MM-dd}-%i.log.gz">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${patternLayout}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${fileNamePrefix}/error" maxDepth="1">
+                    <IfFileName glob="*error*"/>
+                    <IfLastModified age="15d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </appenders>
+
+    <loggers>
+
+        <!-- 日志记录的最低级别为INFO，接口层当前涉及INFO、ERROR -->
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="RollingFileInfo"/>
+            <appender-ref ref="RollingFileError"/>
+        </root>
+    </loggers>
+</configuration>
