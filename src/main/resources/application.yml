@@ -1,0 +1,31 @@
+spring:
+  port: 8099
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  application:
+    name: my-blog
+  profiles:
+    active: dev
+
+mybatis:
+  mapper-locations: classpath:mapper/*xml
+
+# 系统资源监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  config: classpath:logback.xml
